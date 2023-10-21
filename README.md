@@ -15,9 +15,10 @@ This repository contains the code for MLRFNet, a deep learning model for X-ray i
 
 To install the required dependencies, run the following command:
 
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 ## Usage
 
 To train MLRFNet, run the following command:
-python main.py --config configs/mlrfnet.yaml --gpu_ids 1 --name name_exp
+
+`python main.py --config configs/mlrfnet.yaml --gpu_ids 1 --name name_exp`
