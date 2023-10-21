@@ -106,7 +106,7 @@ class NetworkWrapper:
 
         acc_train = self.metric_AUC.compute()
         log_print(
-            f'TRAIN loss={np.mean(epoch_loss):.3f} Acc={acc_train:.3f}')
+            f'TRAIN loss={np.mean(epoch_loss):.4f} Acc={acc_train:.4f}')
         metrics = Namespace(train_loss=np.mean(epoch_loss),
                             train_acc=acc_train)
         if self.lr_scheduler:
@@ -142,7 +142,7 @@ class NetworkWrapper:
         acc_val = self.metric_AUC.compute()
 
         log_print(
-            f'TRAIN loss={np.mean(epoch_val_loss):.3f} Acc={acc_val:.3f}')
+            f'TRAIN loss={np.mean(epoch_val_loss):.4f} Acc={acc_val:.4f}')
         metrics = Namespace(val_loss=np.mean(epoch_val_loss),
                             val_acc=acc_val)
         return metrics

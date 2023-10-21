@@ -84,7 +84,8 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     model = MLRFNet(res2net, fpn_eca, mrfc)
 
     loss_config = config['LOSS']
-    loss = SigmoidFocalLoss()
+    loss = SigmoidFocalLoss(alpha=loss_config['ALPHA'],
+                            gamma=loss_config['GAMMA'])
 
     iter_per_epoch = len(train_loader)
     wrapper = NetworkWrapper(model, loss, iter_per_epoch, opts, config)
@@ -105,8 +106,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
                 "LR_DECAY_FACTOR": config['TRAINING']['LR_DECAY_FACTOR'],
                 "LR_DECAY_STEP": config['TRAINING']['LR_DECAY_STEP']})
     log_params({"LOSS": config['LOSS']['TYPE'],
-                'BETA': config['LOSS']['BETA'],
-                'S': config['LOSS']['S'],
+                'GAMMA': config['LOSS']['GAMMA'],
                 'ALPHA': config['LOSS']['ALPHA'],
                 })
 
@@ -127,7 +127,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
         # Eval on validation set
         val_metrics = wrapper.eval_model(epoch, val_loader, log_print)
         log_print(
-            f'\nEvaluate {epoch + 1} \nLoss:{val_metrics.val_loss:.2f} Acc:{val_metrics.val_acc:.2f}')
+            f'\nEvaluate {epoch + 1} \nLoss:{val_metrics.val_loss:.4f} Acc:{val_metrics.val_acc:.2f}')
 
         log_metric('Valid Loss', val_metrics.val_loss)
         log_metric('val Acc', val_metrics.val_acc)

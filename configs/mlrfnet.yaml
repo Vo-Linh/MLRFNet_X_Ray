@@ -1,6 +1,6 @@
 DATA:
   IMG_DIR: 'data_root/'
-  LABEL_TRAIN: 'Chest14/Label_Val_Chest14_Full.csv'
+  LABEL_TRAIN: 'Chest14/Label_Train_Chest14_Full.csv'
   LABEL_VAL: 'Chest14/Label_Val_Chest14_Full.csv'
   NUM_WORKERS: 2
 TRAINING:
@@ -31,7 +31,6 @@ HEAD:
   LAM: [0.5, 0.3, 0.1]
 LOSS:
   TYPE: 'SigmoidFocalLoss'
-  BETA: 1.0
-  S: 0.2
-  ALPHA: 0.4
+  GAMMA: 2
+  ALPHA: 0.25
   REDUCTION: 'mean'
