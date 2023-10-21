@@ -1,0 +1,37 @@
+DATA:
+  IMG_DIR: 'data_root/'
+  LABEL_TRAIN: 'Chest14/Label_Val_Chest14_Full.csv'
+  LABEL_VAL: 'Chest14/Label_Val_Chest14_Full.csv'
+  NUM_WORKERS: 2
+TRAINING:
+  EPOCHS: 200
+  BATCH_SIZE: 128
+  LR: 0.001
+  LR_USE_DECAY: False
+  LR_DECAY_FACTOR: 0.0
+  LR_DECAY_STEP: 0
+  WEIGHT_DECAY: 0
+  ADAM_B1: 0.5
+  ADAM_B2: 0.999
+EVALUATION:
+  BATCH_SIZE: 64
+BACKBONE:
+  TYPE: 'Res2Net'
+  LAYERS: [3, 4, 6, 3]
+  BASEWIDTH: 26
+  SCALE: 4
+  PRETRAIN: 'https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net50_26w_4s-06e79181.pth'
+NECK:
+  TYPE: 'FPN_ECA'
+  IN_CHANNELS: [512, 1024, 2048]
+HEAD:
+  TYPE: 'MRFC'
+  IN_CHANNELS: [512, 1024, 2048]
+  NUM_CLASSES: 14
+  LAM: [0.5, 0.3, 0.1]
+LOSS:
+  TYPE: 'SigmoidFocalLoss'
+  BETA: 1.0
+  S: 0.2
+  ALPHA: 0.4
+  REDUCTION: 'mean'

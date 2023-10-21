@@ -1,0 +1,11 @@
+1> Loss giảm, acc giảm --> khả năng cao là do tất cả ngõ ra bằng 0.
+2> Để đánh giá người ta sử dụng AOC?
+3> Các bài báo trước sẽ sử dụng bce chứ ko phải ce. https://pytorch.org/vision/main/_modules/torchvision/ops/focal_loss.html
+4> Liệu rằng tính acc có đúng? Chỉnh lại Wrapper.eval_model() theo hướng tính AUC chứ ko phải ACC, hiện tại ACC đang bị tính bởi Thréhold =0.5 đây là ngưỡng rất cao trong ứng dụng này.
+5> CE loss được theo sau bởi solf max, đây là điều khiến loss không hoạt động được ở trình trạng multi label
+
+Kết luận: a> chỉnh lại loss sử dụng sigmoid_focal_loss b> chỉnh lại wrapper.eval
+# c> kiểm tra lại nếu ngõ ra thực sự là score hay đã đi qua activation?
+
+
+

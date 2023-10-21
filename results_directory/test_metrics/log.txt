@@ -1,0 +1,18 @@
+----------------- Options ---------------
+               checkpoint: None                          
+                   config: configs/mlrfnet.yaml          	[default: config/defaults.yaml]
+                  gpu_ids: 1                             	[default: 0]
+                  isTrain: True                          
+                     name: test_metrics                  	[default: name_exp]
+              num_workers: 0                             
+                    phase: train                         
+              results_dir: results_directory             
+                   resume: True                          
+                save_step: 50                            
+                     seed: 10                            
+              start_epoch: 0                             
+----------------- End -------------------
+Load datasets from data_root/: train_set=25596 val_set=25596
+Start training from epoch 0 to 200, best acc: 0.0
+>>> Epoch 1
+TRAIN loss=0.030 Acc=0.498
