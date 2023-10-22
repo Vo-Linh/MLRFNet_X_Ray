@@ -16,3 +16,43 @@ Load datasets from data_root/: train_set=86524 val_set=25596
 Start training from epoch 0 to 100, best acc: 0.0
 >>> Epoch 1
 TRAIN loss=0.0591 Acc=0.5945
+TRAIN loss=0.0881 Acc=0.5690
+
+Evaluate 1 
+Loss:0.0881 Acc:0.57
+>>Save best model: epoch=1 AUROC:0.5690
+>>> Epoch 2
+TRAIN loss=0.0567 Acc=0.6448
+TRAIN loss=0.0868 Acc=0.6284
+
+Evaluate 2 
+Loss:0.0868 Acc:0.63
+>>Save best model: epoch=2 AUROC:0.6284
+>>> Epoch 3
+TRAIN loss=0.0560 Acc=0.6698
+TRAIN loss=0.0860 Acc=0.6269
+
+Evaluate 3 
+Loss:0.0860 Acc:0.63
+>>> Epoch 4
+TRAIN loss=0.0554 Acc=0.6817
+TRAIN loss=0.0847 Acc=0.6559
+
+Evaluate 4 
+Loss:0.0847 Acc:0.66
+>>Save best model: epoch=4 AUROC:0.6559
+>>> Epoch 5
+TRAIN loss=0.0549 Acc=0.6983
+TRAIN loss=0.0863 Acc=0.6642
+
+Evaluate 5 
+Loss:0.0863 Acc:0.66
+>>Save best model: epoch=5 AUROC:0.6642
+>>> Epoch 6
+TRAIN loss=0.0546 Acc=0.7079
+TRAIN loss=0.0858 Acc=0.6775
+
+Evaluate 6 
+Loss:0.0858 Acc:0.68
+>>Save best model: epoch=6 AUROC:0.6775
+>>> Epoch 7

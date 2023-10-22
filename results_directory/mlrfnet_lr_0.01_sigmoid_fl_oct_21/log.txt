@@ -170,3 +170,43 @@ Evaluate 23
 Loss:0.02 Acc:0.72
 >>> Epoch 24
 TRAIN loss=0.014 Acc=0.754
+TRAIN loss=0.021 Acc=0.730
+
+Evaluate 24 
+Loss:0.02 Acc:0.73
+>>Save best model: epoch=24 AUROC:0.73
+>>> Epoch 25
+TRAIN loss=0.014 Acc=0.752
+TRAIN loss=0.022 Acc=0.729
+
+Evaluate 25 
+Loss:0.02 Acc:0.73
+>>> Epoch 26
+TRAIN loss=0.014 Acc=0.756
+TRAIN loss=0.021 Acc=0.732
+
+Evaluate 26 
+Loss:0.02 Acc:0.73
+>>Save best model: epoch=26 AUROC:0.73
+>>> Epoch 27
+TRAIN loss=0.014 Acc=0.759
+TRAIN loss=0.022 Acc=0.732
+
+Evaluate 27 
+Loss:0.02 Acc:0.73
+>>Save best model: epoch=27 AUROC:0.73
+>>> Epoch 28
+TRAIN loss=0.014 Acc=0.761
+TRAIN loss=0.022 Acc=0.734
+
+Evaluate 28 
+Loss:0.02 Acc:0.73
+>>Save best model: epoch=28 AUROC:0.73
+>>> Epoch 29
+TRAIN loss=0.014 Acc=0.765
+TRAIN loss=0.021 Acc=0.734
+
+Evaluate 29 
+Loss:0.02 Acc:0.73
+>>Save best model: epoch=29 AUROC:0.73
+>>> Epoch 30

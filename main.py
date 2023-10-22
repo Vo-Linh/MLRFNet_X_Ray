@@ -1,22 +1,21 @@
+
 import os
-import time
 from typing import Any, Text, Mapping
 
 import torch
 from torchvision.transforms import transforms
-import torch.utils.model_zoo as model_zoo
 import mlflow
 from mlflow import log_metric, log_param, log_params, log_artifacts, set_experiment
 
 from helper import parser
 from datasets.chest14 import Chest14Dataset
-from models.backbones.res2net import Res2Net, Bottle2neck
-from models.necks.fpn_eca import FPN_ECA
-from models.heads.mrfc import MRFC
 from models.classifiers.mlrfnet import MLRFNet
 from models.wrapper import NetworkWrapper
 
 from registry.registry_losses import define_loss
+from registry.registry_backbone import define_backbone
+from registry.registry_neck import define_neck
+from registry.registry_head import define_head
 
 # =====================================================
 # TODO
@@ -24,14 +23,9 @@ from registry.registry_losses import define_loss
 # 2. Use torchmetrics evaluate model AUROC
 # 3. Remove sigmoid activation in last layer of model
 # 4. Set name of experience on MLFLow
+# 5. Link module to registry
 # Next step
-# 1. Link all modules to register modules
-#   Loss    Done
-#   Backbone
-#   Neck
-#   Head
-#   Classifier 
-# 2. Convert output of metrics from Avg to each of Class
+# 1. Convert output of metrics from Avg to each of Class
 # =====================================================
 
 # setup log in mlflow
@@ -83,22 +77,11 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
                                              shuffle=False, num_workers=data_config['NUM_WORKERS'],
                                              pin_memory=True)
 
-    backbone_config = config['BACKBONE']
-    res2net = Res2Net(Bottle2neck, backbone_config['LAYERS'], backbone_config['BASEWIDTH'],
-                      backbone_config['SCALE'])
-    if backbone_config['PRETRAIN']:
-        res2net.load_state_dict(
-            model_zoo.load_url(backbone_config['PRETRAIN']))
+    backbone = define_backbone(config=config)
+    neck = define_neck(config=config)
+    head = define_head(config=config)
 
-    neck_config = config['NECK']
-    fpn_eca = FPN_ECA(in_channels=neck_config['IN_CHANNELS'])
-
-    head_config = config['HEAD']
-    mrfc = MRFC(in_channels=head_config['IN_CHANNELS'],
-                num_classes=head_config['NUM_CLASSES'],
-                lam=head_config['LAM'])
-
-    model = MLRFNet(res2net, fpn_eca, mrfc)
+    model = MLRFNet(backbone, neck, head)
 
     loss = define_loss(config=config)
 
@@ -120,7 +103,6 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     log_params({"LR": config['TRAINING']['LR'],
                 "LR_DECAY_FACTOR": config['TRAINING']['LR_DECAY_FACTOR'],
                 "LR_DECAY_STEP": config['TRAINING']['LR_DECAY_STEP']})
-
 
     for epoch in range(opts.start_epoch, n_epochs):
         log_print(f'>>> Epoch {epoch + 1}')
@@ -159,12 +141,12 @@ if __name__ == '__main__':
     opt, log_file = parse.parse()
     opt.is_Train = True
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in opt.gpu_ids)
-    
+
     config = parser.read_yaml_config(opt.config)
     mlflow.set_tag("mlflow.runName", opt.name)
 
     main(opts=opt, config=config)
-    
+
     # Log an artifact (output file)
     if not os.path.exists("mlflow"):
         os.makedirs("mlflow")
