@@ -25,7 +25,7 @@ def biased_focal_loss(pred, target, beta=1.0, alpha=0.4, s=0.2, reduction='mean'
     assert beta > 0
     if target.numel() == 0:
         return pred.sum() * 0
-
+    pred = torch.sigmoid(pred)
     assert pred.size() == target.size()
 
     loss = -alpha * (1 - pred)**beta * target * torch.log(pred) - \

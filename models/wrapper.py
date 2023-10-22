@@ -96,7 +96,7 @@ class NetworkWrapper:
 
         for data in tqdm(data_loader, ascii=' >='):
             image, mask = self.recursive_todevice(data)
-            # mask = mask.long()
+
             pred = self.net(image)
             loss = self.losses(pred, mask)
             self.optim_step_(loss)

@@ -4,8 +4,8 @@ DATA:
   LABEL_VAL: 'Chest14/Label_Val_Chest14_Full.csv'
   NUM_WORKERS: 2
 TRAINING:
-  EPOCHS: 200
-  BATCH_SIZE: 128
+  EPOCHS: 100
+  BATCH_SIZE: 2
   LR: 0.001
   LR_USE_DECAY: False
   LR_DECAY_FACTOR: 0.0
@@ -14,7 +14,7 @@ TRAINING:
   ADAM_B1: 0.5
   ADAM_B2: 0.999
 EVALUATION:
-  BATCH_SIZE: 64
+  BATCH_SIZE: 2
 BACKBONE:
   TYPE: 'Res2Net'
   LAYERS: [3, 4, 6, 3]
@@ -30,8 +30,9 @@ HEAD:
   NUM_CLASSES: 14
   LAM: [0.5, 0.3, 0.1]
 LOSS:
-  TYPE: 'SigmoidFocalLoss'
+  TYPE: 'BiasedFocalLoss'
   BETA: 1.0
   S: 0.2
   ALPHA: 0.4
   REDUCTION: 'mean'
+  LOSS_WEIGHT: 1

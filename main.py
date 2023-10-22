@@ -14,22 +14,28 @@ from models.backbones.res2net import Res2Net, Bottle2neck
 from models.necks.fpn_eca import FPN_ECA
 from models.heads.mrfc import MRFC
 from models.classifiers.mlrfnet import MLRFNet
-from models.losses.biased_focal_loss import BiasedFocalLoss
-from models.losses.sigmoid_focal_loss import SigmoidFocalLoss
 from models.wrapper import NetworkWrapper
+
+from registry.registry_losses import define_loss
 
 # =====================================================
 # TODO
 # 1. Setup tracking metrics via MLFlow
 # 2. Use torchmetrics evaluate model AUROC
 # 3. Remove sigmoid activation in last layer of model
+# 4. Set name of experience on MLFLow
 # Next step
 # 1. Link all modules to register modules
-# 2. Set name of experience on MLFLow
-# 3. Convert output of metrics from Avg to each of Class
+#   Loss    Done
+#   Backbone
+#   Neck
+#   Head
+#   Classifier 
+# 2. Convert output of metrics from Avg to each of Class
 # =====================================================
 
 # setup log in mlflow
+set_experiment("MLRFNet_X_Ray")
 mlflow.autolog()
 
 
@@ -94,10 +100,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
 
     model = MLRFNet(res2net, fpn_eca, mrfc)
 
-    loss_config = config['LOSS']
-    loss = BiasedFocalLoss(alpha=loss_config['ALPHA'],
-                            beta=loss_config['BETA'],
-                            s=loss_config['S'])
+    loss = define_loss(config=config)
 
     iter_per_epoch = len(train_loader)
     wrapper = NetworkWrapper(model, loss, iter_per_epoch, opts, config)
@@ -117,10 +120,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     log_params({"LR": config['TRAINING']['LR'],
                 "LR_DECAY_FACTOR": config['TRAINING']['LR_DECAY_FACTOR'],
                 "LR_DECAY_STEP": config['TRAINING']['LR_DECAY_STEP']})
-    log_params({"LOSS": config['LOSS']['TYPE'],
-                'GAMMA': config['LOSS']['GAMMA'],
-                'BETA': config['LOSS']['BETA'],
-                })
+
 
     for epoch in range(opts.start_epoch, n_epochs):
         log_print(f'>>> Epoch {epoch + 1}')
@@ -150,7 +150,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
             best_acc = mean_acc
             wrapper.save_ckpt(epoch, os.path.dirname(
                 log_file), best_acc=best_acc, is_best=True)
-            log_print('>>Save best model: epoch={} AUROC:{:.2f}'.format(
+            log_print('>>Save best model: epoch={} AUROC:{:.4f}'.format(
                 epoch + 1, mean_acc))
 
 
@@ -159,9 +159,12 @@ if __name__ == '__main__':
     opt, log_file = parse.parse()
     opt.is_Train = True
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in opt.gpu_ids)
-
+    
     config = parser.read_yaml_config(opt.config)
+    mlflow.set_tag("mlflow.runName", opt.name)
+
     main(opts=opt, config=config)
+    
     # Log an artifact (output file)
     if not os.path.exists("mlflow"):
         os.makedirs("mlflow")
