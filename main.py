@@ -18,6 +18,17 @@ from models.losses.biased_focal_loss import BiasedFocalLoss
 from models.losses.sigmoid_focal_loss import SigmoidFocalLoss
 from models.wrapper import NetworkWrapper
 
+# =====================================================
+# TODO
+# 1. Setup tracking metrics via MLFlow
+# 2. Use torchmetrics evaluate model AUROC
+# 3. Remove sigmoid activation in last layer of model
+# Next step
+# 1. Link all modules to register modules
+# 2. Set name of experience on MLFLow
+# 3. Convert output of metrics from Avg to each of Class
+# =====================================================
+
 # setup log in mlflow
 mlflow.autolog()
 
@@ -84,8 +95,9 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     model = MLRFNet(res2net, fpn_eca, mrfc)
 
     loss_config = config['LOSS']
-    loss = SigmoidFocalLoss(alpha=loss_config['ALPHA'],
-                            gamma=loss_config['GAMMA'])
+    loss = BiasedFocalLoss(alpha=loss_config['ALPHA'],
+                            beta=loss_config['BETA'],
+                            s=loss_config['S'])
 
     iter_per_epoch = len(train_loader)
     wrapper = NetworkWrapper(model, loss, iter_per_epoch, opts, config)
@@ -107,7 +119,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
                 "LR_DECAY_STEP": config['TRAINING']['LR_DECAY_STEP']})
     log_params({"LOSS": config['LOSS']['TYPE'],
                 'GAMMA': config['LOSS']['GAMMA'],
-                'ALPHA': config['LOSS']['ALPHA'],
+                'BETA': config['LOSS']['BETA'],
                 })
 
     for epoch in range(opts.start_epoch, n_epochs):
