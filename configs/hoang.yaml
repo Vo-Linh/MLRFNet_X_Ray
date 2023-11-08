@@ -18,9 +18,9 @@ EVALUATION:
 BACKBONE:
   TYPE: 'Res2Net'
   LAYERS: [3, 4, 6, 3]
-  BASEWIDTH: 14
+  BASEWIDTH: 26
   SCALE: 8
-  PRETRAIN: 'https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net50_14w_8s-6527dddc.pth'
+  PRETRAIN: 'https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net50_26w_8s-2c7c9f12.pth'
 NECK:
   TYPE: 'FPN_ECA'
   IN_CHANNELS: [512, 1024, 2048]

@@ -64,8 +64,11 @@ class NetworkWrapper:
             self.optimizer.load_state_dict(optim_dict)
 
         # Initialize lrd scheduler
-        self.lr_scheduler = None
+        def scheduler_lambda(epoch): return 0.9 ** epoch
+        self.lr_scheduler = torch.optim.lr_scheduler.LambdaLR(self.optimizer,
+                                lr_lambda=scheduler_lambda)
 
+        
     def recursive_todevice(self, x):
         if isinstance(x, torch.Tensor):
             return x.to(self.device, dtype=torch.float)
@@ -78,6 +81,7 @@ class NetworkWrapper:
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+        self.lr_scheduler.step()
 
     def train_epoch(self, epoch, data_loader, log_print):
         """Train the model for one epoch.
@@ -193,6 +197,7 @@ class NetworkWrapper:
             assert (torch.cuda.is_available())
             print("Let's use", len(gpu_ids), "GPUs!")
             self.net.to(gpu_ids[0])
-            self.net = torch.nn.DataParallel(self.net, gpu_ids)  # multi-GPUs
+            # multi-GPUs
+            self.net = torch.nn.DataParallel(self.net, gpu_ids)  
 
         return self.net

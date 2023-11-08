@@ -45,7 +45,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     data_transforms = {
         'train': transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize(224),
+            transforms.Resize(256),
             transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation([-5, 5]),
@@ -56,7 +56,8 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
         ]),
         'val': transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize(224),
+            transforms.Resize(256),
+             transforms.RandomResizedCrop(224),
             transforms.Normalize([0.485, 0.456, 0.406],
                                  [0.229, 0.224, 0.225])
         ]),
