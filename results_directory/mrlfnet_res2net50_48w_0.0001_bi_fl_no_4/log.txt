@@ -1,0 +1,14 @@
+----------------- Options ---------------
+               checkpoint: None                          
+                   config: configs/mlrfnet.yaml          	[default: config/defaults.yaml]
+                  gpu_ids: 1                             	[default: 0]
+                  isTrain: True                          
+                     name: mrlfnet_res2net50_48w_0.0001_bi_fl_no_4	[default: name_exp]
+              num_workers: 0                             
+                    phase: train                         
+              results_dir: results_directory             
+                   resume: True                          
+                save_step: 50                            
+                     seed: 10                            
+              start_epoch: 0                             
+----------------- End -------------------

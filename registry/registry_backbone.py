@@ -10,6 +10,7 @@ def define_backbone(config):
                                    baseWidth=config['BACKBONE']['BASEWIDTH'],
                                    scale=config['BACKBONE']['SCALE'])
         backbone.load_state_dict(model_zoo.load_url(
-            config['BACKBONE']['PRETRAIN']))
+            config['BACKBONE']['PRETRAIN']),strict=False)
         
     return backbone
+    

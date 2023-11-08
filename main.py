@@ -41,23 +41,22 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     log = open(log_file, 'a')
     def log_print(ms): return parse.log(ms, log)
 
-    # Configure data loader
+    # Configure dataloader
     data_transforms = {
         'train': transforms.Compose([
-            transforms.Resize(256),
+            transforms.ToTensor(),
+            transforms.Resize(224),
             transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation([-5, 5]),
             transforms.ColorJitter(
                 brightness=0.9, contrast=0.9, saturation=1.1, hue=0.05),
-            transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406],
                                  [0.229, 0.224, 0.225])
         ]),
         'val': transforms.Compose([
-            transforms.Resize(256),
-            transforms.RandomResizedCrop(224),
             transforms.ToTensor(),
+            transforms.Resize(224),
             transforms.Normalize([0.485, 0.456, 0.406],
                                  [0.229, 0.224, 0.225])
         ]),
@@ -121,7 +120,7 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
         # Eval on validation set
         val_metrics = wrapper.eval_model(epoch, val_loader, log_print)
         log_print(
-            f'\nEvaluate {epoch + 1} \nLoss:{val_metrics.val_loss:.4f} Acc:{val_metrics.val_acc:.2f}')
+            f'\nEvaluate {epoch + 1} \nLoss:{val_metrics.val_loss:.4f} Acc:{val_metrics.val_acc:.4f}')
 
         log_metric('Valid Loss', val_metrics.val_loss)
         log_metric('val Acc', val_metrics.val_acc)

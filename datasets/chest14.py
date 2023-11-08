@@ -1,5 +1,8 @@
 import os
+
+import cv2
 from PIL import Image
+from skimage import exposure
 
 import torch
 from torch.utils.data import Dataset

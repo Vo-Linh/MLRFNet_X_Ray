@@ -98,6 +98,8 @@ class Bottle2neck(nn.Module):
         return out
 
 
+# TODO
+# Add method load pretrain model
 class Res2Net(nn.Module):
     """
     Res2Net model architecture.
@@ -107,12 +109,11 @@ class Res2Net(nn.Module):
         layers (list[int]): The number of layers for each stage of the Res2Net.
         baseWidth (int): The base width for the Res2Net.
         scale (int): The scale factor for the Res2Net.
-        num_classes (int): The number of classes to classify.
 
     Returns:
         nn.Module: The Res2Net model.
     """
-    def __init__(self, block, layers, baseWidth=26, scale=4, num_classes=1000):
+    def __init__(self, block, layers, baseWidth=26, scale=4):
         self.inplanes = 64
         super(Res2Net, self).__init__()
         self.baseWidth = baseWidth
@@ -129,7 +130,6 @@ class Res2Net(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -179,8 +179,11 @@ def res2net50_26w_4s(pretrained=False, **kwargs):
     """
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], baseWidth=26, scale=4, **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(
-            model_urls['res2net50_26w_4s']))
+        model.load_state_dict(model_zoo.load_url
+            (model_urls['res2net50_26w_4s']),
+            strict=False)
+
+        
     return model
 
 
@@ -193,7 +196,8 @@ def res2net101_26w_4s(pretrained=False, **kwargs):
                     baseWidth=26, scale=4, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(
-            model_urls['res2net101_26w_4s']))
+            model_urls['res2net101_26w_4s']),
+            strict=False)
     return model
 
 
@@ -205,7 +209,8 @@ def res2net50_26w_6s(pretrained=False, **kwargs):
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], baseWidth=26, scale=6, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(
-            model_urls['res2net50_26w_6s']))
+            model_urls['res2net50_26w_6s']),
+            strict=False)
     return model
 
 
@@ -217,7 +222,8 @@ def res2net50_26w_8s(pretrained=False, **kwargs):
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], baseWidth=26, scale=8, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(
-            model_urls['res2net50_26w_8s']))
+            model_urls['res2net50_26w_8s']),
+            strict=False)
     return model
 
 
@@ -229,7 +235,8 @@ def res2net50_48w_2s(pretrained=False, **kwargs):
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], baseWidth=48, scale=2, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(
-            model_urls['res2net50_48w_2s']))
+            model_urls['res2net50_48w_2s']),
+            strict=False)
     return model
 
 
@@ -241,7 +248,8 @@ def res2net50_14w_8s(pretrained=False, **kwargs):
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], baseWidth=14, scale=8, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(
-            model_urls['res2net50_14w_8s']))
+            model_urls['res2net50_14w_8s']),
+            strict=False)
     return model
 
 

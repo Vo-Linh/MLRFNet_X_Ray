@@ -68,7 +68,7 @@ class NetworkWrapper:
 
     def recursive_todevice(self, x):
         if isinstance(x, torch.Tensor):
-            return x.to(self.device)
+            return x.to(self.device, dtype=torch.float)
         elif isinstance(x, dict):
             return {k: self.recursive_todevice(v) for k, v in x.items()}
         else:
@@ -142,7 +142,7 @@ class NetworkWrapper:
         acc_val = self.metric_AUC.compute()
 
         log_print(
-            f'TRAIN loss={np.mean(epoch_val_loss):.4f} Acc={acc_val:.4f}')
+            f'VALID loss={np.mean(epoch_val_loss):.4f} Acc={acc_val:.4f}')
         metrics = Namespace(val_loss=np.mean(epoch_val_loss),
                             val_acc=acc_val)
         return metrics

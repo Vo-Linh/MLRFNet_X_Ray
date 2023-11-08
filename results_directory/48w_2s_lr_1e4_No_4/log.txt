@@ -1,0 +1,146 @@
+----------------- Options ---------------
+               checkpoint: None                          
+                   config: configs/mlrfnet.yaml          	[default: config/defaults.yaml]
+                  gpu_ids: 1                             	[default: 0]
+                  isTrain: True                          
+                     name: 48w_2s_lr_1e4_No_4            	[default: name_exp]
+              num_workers: 0                             
+                    phase: train                         
+              results_dir: results_directory             
+                   resume: True                          
+                save_step: 50                            
+                     seed: 10                            
+              start_epoch: 0                             
+----------------- End -------------------
+Load datasets from data_root/: train_set=86524 val_set=25596
+Start training from epoch 0 to 20, best acc: 0.0
+>>> Epoch 1
+TRAIN loss=0.0578 Acc=0.6552
+VALID loss=0.0830 Acc=0.6887
+
+Evaluate 1 
+Loss:0.0830 Acc:0.6887
+>>Save best model: epoch=1 AUROC:0.6887
+>>> Epoch 2
+TRAIN loss=0.0539 Acc=0.7220
+VALID loss=0.0802 Acc=0.7347
+
+Evaluate 2 
+Loss:0.0802 Acc:0.7347
+>>Save best model: epoch=2 AUROC:0.7347
+>>> Epoch 3
+TRAIN loss=0.0527 Acc=0.7459
+VALID loss=0.0784 Acc=0.7481
+
+Evaluate 3 
+Loss:0.0784 Acc:0.7481
+>>Save best model: epoch=3 AUROC:0.7481
+>>> Epoch 4
+TRAIN loss=0.0520 Acc=0.7594
+VALID loss=0.0783 Acc=0.7581
+
+Evaluate 4 
+Loss:0.0783 Acc:0.7581
+>>Save best model: epoch=4 AUROC:0.7581
+>>> Epoch 5
+TRAIN loss=0.0515 Acc=0.7711
+VALID loss=0.0779 Acc=0.7552
+
+Evaluate 5 
+Loss:0.0779 Acc:0.7552
+>>> Epoch 6
+TRAIN loss=0.0511 Acc=0.7752
+VALID loss=0.0776 Acc=0.7624
+
+Evaluate 6 
+Loss:0.0776 Acc:0.7624
+>>Save best model: epoch=6 AUROC:0.7624
+>>> Epoch 7
+TRAIN loss=0.0509 Acc=0.7817
+VALID loss=0.0778 Acc=0.7618
+
+Evaluate 7 
+Loss:0.0778 Acc:0.7618
+>>> Epoch 8
+TRAIN loss=0.0506 Acc=0.7837
+VALID loss=0.0783 Acc=0.7613
+
+Evaluate 8 
+Loss:0.0783 Acc:0.7613
+>>> Epoch 9
+TRAIN loss=0.0503 Acc=0.7879
+VALID loss=0.0766 Acc=0.7704
+
+Evaluate 9 
+Loss:0.0766 Acc:0.7704
+>>Save best model: epoch=9 AUROC:0.7704
+>>> Epoch 10
+TRAIN loss=0.0501 Acc=0.7921
+VALID loss=0.0785 Acc=0.7702
+
+Evaluate 10 
+Loss:0.0785 Acc:0.7702
+>>> Epoch 11
+TRAIN loss=0.0498 Acc=0.7974
+VALID loss=0.0777 Acc=0.7692
+
+Evaluate 11 
+Loss:0.0777 Acc:0.7692
+>>> Epoch 12
+TRAIN loss=0.0496 Acc=0.8020
+VALID loss=0.0769 Acc=0.7658
+
+Evaluate 12 
+Loss:0.0769 Acc:0.7658
+>>> Epoch 13
+TRAIN loss=0.0495 Acc=0.8014
+VALID loss=0.0763 Acc=0.7772
+
+Evaluate 13 
+Loss:0.0763 Acc:0.7772
+>>Save best model: epoch=13 AUROC:0.7772
+>>> Epoch 14
+TRAIN loss=0.0493 Acc=0.8038
+VALID loss=0.0785 Acc=0.7687
+
+Evaluate 14 
+Loss:0.0785 Acc:0.7687
+>>> Epoch 15
+TRAIN loss=0.0492 Acc=0.8049
+VALID loss=0.0779 Acc=0.7709
+
+Evaluate 15 
+Loss:0.0779 Acc:0.7709
+>>> Epoch 16
+TRAIN loss=0.0490 Acc=0.8109
+VALID loss=0.0764 Acc=0.7790
+
+Evaluate 16 
+Loss:0.0764 Acc:0.7790
+>>Save best model: epoch=16 AUROC:0.7790
+>>> Epoch 17
+TRAIN loss=0.0487 Acc=0.8140
+VALID loss=0.0775 Acc=0.7728
+
+Evaluate 17 
+Loss:0.0775 Acc:0.7728
+>>> Epoch 18
+TRAIN loss=0.0485 Acc=0.8167
+VALID loss=0.0754 Acc=0.7803
+
+Evaluate 18 
+Loss:0.0754 Acc:0.7803
+>>Save best model: epoch=18 AUROC:0.7803
+>>> Epoch 19
+TRAIN loss=0.0485 Acc=0.8184
+VALID loss=0.0770 Acc=0.7808
+
+Evaluate 19 
+Loss:0.0770 Acc:0.7808
+>>Save best model: epoch=19 AUROC:0.7808
+>>> Epoch 20
+TRAIN loss=0.0483 Acc=0.8204
+VALID loss=0.0765 Acc=0.7798
+
+Evaluate 20 
+Loss:0.0765 Acc:0.7798
