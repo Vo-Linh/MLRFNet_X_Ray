@@ -6,7 +6,7 @@ import cv2
 from PIL import Image
 import pandas as pd
 
-class CheXpert(Dataset):
+class CheXpertDataset(Dataset):
     '''
     Reference: 
         @inproceedings{yuan2021robust,
@@ -23,7 +23,7 @@ class CheXpert(Dataset):
                  use_frontal=True,
                  use_upsampling=True,
                  flip_label=False,
-                 verbose=True,
+                 verbose=False,
                  upsampling_cols=['Cardiomegaly', 'Consolidation'],
                  train_cols=['Cardiomegaly', 'Edema', 'Consolidation', 'Atelectasis',  'Pleural Effusion'],
                  transform = None):
@@ -32,6 +32,7 @@ class CheXpert(Dataset):
         self.df = pd.read_csv(csv_path)
         self.df['Path'] = self.df['Path'].str.replace('CheXpert-v1.0-small/', '')
         self.df['Path'] = self.df['Path'].str.replace('CheXpert-v1.0/', '')
+        self.transform = transform
         if use_frontal:
             self.df = self.df[self.df['Frontal/Lateral'] == 'Frontal']  
             
@@ -76,7 +77,6 @@ class CheXpert(Dataset):
             self.select_cols = [train_cols[ignore_index]]  # this var determines the number of classes
             self.value_counts_dict = self.df[self.select_cols[0]].value_counts().to_dict()
         
-        self.mode = mode
         self.ignore_index = ignore_index
         
         self._images_list =  [image_root_path+path for path in self.df['Path'].tolist()]
@@ -131,24 +131,22 @@ class CheXpert(Dataset):
     
     def __getitem__(self, idx):
 
-        image = cv2.imread(self._images_list[idx], 0)
-        image = Image.fromarray(image)
-
-        image = self.transform(image)
-        image = np.array(image)
-        image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        image = Image.open(self._images_list[idx]).convert('RGB')
+        if self.transform:
+            image = self.transform(image)
+        
         
         if self.ignore_index != -1: # multi-class mode
-            label = np.array(self._labels_list[idx]).reshape(-1).astype(np.float32)
+            label = torch.tensor(self._labels_list[idx]).reshape(-1).astype(np.float32)
         else:
-            label = np.array(self._labels_list[idx]).reshape(-1).astype(np.float32)
+            label = torch.tensor(self._labels_list[idx], dtype= torch.float32)
         return image, label
 
 
 if __name__ == '__main__':
-    root = '../chexpert/dataset/CheXpert-v1.0-small/'
-    traindSet = CheXpert(csv_path=root+'train.csv', image_root_path=root, use_upsampling=True, use_frontal=True, ignore_index=0)
-    testSet =  CheXpert(csv_path=root+'valid.csv',  image_root_path=root, use_upsampling=False, use_frontal=True, ignore_index=0)
-
+    root = '/home/data_root/chesxpert/'
+    traindSet = CheXpertDataset(csv_path=root+'train.csv', image_root_path=root, use_upsampling=True, use_frontal=True, ignore_index=0)
+    testSet =  CheXpertDataset(csv_path=root+'valid.csv',  image_root_path=root, use_upsampling=False, use_frontal=True, ignore_index=-1)
+    print(testSet[4][1])
 
  
