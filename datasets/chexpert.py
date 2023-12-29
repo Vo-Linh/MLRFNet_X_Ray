@@ -1,8 +1,6 @@
 import numpy as np
 import torch 
 from torch.utils.data import Dataset
-import torchvision.transforms as tfs
-import cv2
 from PIL import Image
 import pandas as pd
 
@@ -109,22 +107,6 @@ class CheXpertDataset(Dataset):
                 self.imratio = np.mean(imratio_list)
                 self.imratio_list = imratio_list
                 print ('-'*30)
-            
-    @property        
-    def class_counts(self):
-        return self.value_counts_dict
-    
-    @property
-    def imbalance_ratio(self):
-        return self.imratio
-
-    @property
-    def num_classes(self):
-        return len(self.select_cols)
-       
-    @property  
-    def data_size(self):
-        return self._num_images 
     
     def __len__(self):
         return self._num_images
@@ -135,7 +117,6 @@ class CheXpertDataset(Dataset):
         if self.transform:
             image = self.transform(image)
         
-        
         if self.ignore_index != -1: # multi-class mode
             label = torch.tensor(self._labels_list[idx]).reshape(-1).astype(np.float32)
         else:
@@ -145,8 +126,8 @@ class CheXpertDataset(Dataset):
 
 if __name__ == '__main__':
     root = '/home/data_root/chesxpert/'
-    traindSet = CheXpertDataset(csv_path=root+'train.csv', image_root_path=root, use_upsampling=True, use_frontal=True, ignore_index=0)
+    traindSet = CheXpertDataset(csv_path=root+'train.csv', image_root_path=root, use_upsampling=True, use_frontal=True, ignore_index=-1)
     testSet =  CheXpertDataset(csv_path=root+'valid.csv',  image_root_path=root, use_upsampling=False, use_frontal=True, ignore_index=-1)
-    print(testSet[4][1])
+    print(traindSet[12][1])
 
  
