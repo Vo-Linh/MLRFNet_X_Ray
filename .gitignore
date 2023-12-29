@@ -4,3 +4,5 @@ __pycache__
 Test/
 *.pth
 mlruns
+results_directory/
+Chest14/

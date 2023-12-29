@@ -34,11 +34,12 @@ class CSRA(nn.Module):
         score = self.head(x) / torch.norm(self.head.weight,
                                           dim=1, keepdim=True).transpose(0, 1)
         score = score.flatten(2)
+        
         base_logit = torch.mean(score, dim=2)
         
         score_soft = self.softmax(score * self.T)
         att_logit = torch.sum(score * score_soft, dim=2)
-
+        
         return base_logit + self.lam * att_logit
 
 

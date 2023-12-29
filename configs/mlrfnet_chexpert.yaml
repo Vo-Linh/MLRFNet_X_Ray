@@ -1,26 +1,28 @@
 DATA_TRAIN:
-  TYPE: 'Chest14Dataset'
-  IMG_DIR: '/home/data_root/chest14'
-  LABEL: '/home/Chest14/Label_Train_Chest14_Full.csv'
-  CLASS_COL: ['Emphysema','Hernia','Nodule','Effusion','Pleural_Thickening','Pneumonia','Cardiomegaly','Infiltration','Consolidation','Atelectasis','Pneumothorax','Mass','Edema','Fibrosis']
+  TYPE: 'CheXpertDataset'
+  IMG_DIR: '/home/data_root/chesxpert/'
+  LABEL: '/home/data_root/chesxpert/train75.csv'
+  CLASS_COL: ['Cardiomegaly', 'Edema', 'Consolidation', 'Atelectasis',  'Pleural Effusion']
   NUM_WORKERS: 2
+  IGN_LABEL: -1
 DATA_VAL:
-  TYPE: 'Chest14Dataset'
-  IMG_DIR: '/home/data_root/chest14'
-  LABEL: '/home/Chest14/Label_Val_Chest14_Full.csv'
-  CLASS_COL: ['Emphysema','Hernia','Nodule','Effusion','Pleural_Thickening','Pneumonia','Cardiomegaly','Infiltration','Consolidation','Atelectasis','Pneumothorax','Mass','Edema','Fibrosis']
-  NUM_WORKERS: 2
-DATA_TEST:
-  USE: 'False'
   TYPE: 'CheXpertDataset'
   IMG_DIR: '/home/data_root/chesxpert/'
   LABEL: '/home/data_root/chesxpert/valid.csv'
   CLASS_COL: ['Cardiomegaly', 'Edema', 'Consolidation', 'Atelectasis',  'Pleural Effusion']
+  NUM_WORKERS: 2
+  IGN_LABEL: -1
+DATA_TEST:
+  USE: 'True'
+  TYPE: 'Chest14Dataset'
+  IMG_DIR: '/home/data_root/chest14'
+  LABEL: '/home/Chest14/Label_Val_Chest14_Full.csv'
+  CLASS_COL: ['Cardiomegaly', 'Edema', 'Consolidation', 'Atelectasis',  'Pleural_Thickening']
   IGN_LABEL: -1
   NUM_WORKERS: 0
 TRAINING:
   EPOCHS: 20
-  BATCH_SIZE: 32
+  BATCH_SIZE: 64
   LR: 0.0001
   LR_USE_DECAY: False
   LR_DECAY_FACTOR: 0.0
@@ -42,13 +44,13 @@ NECK:
 HEAD:
   TYPE: 'MRFC'
   IN_CHANNELS: [512, 1024, 2048]
-  NUM_CLASSES: 14
+  NUM_CLASSES: 5
   LAM: [0.5, 0.3, 0.1]
 SELECTION:
   TYPE: 'FPN_VIB'
   IN_CHANNELS: [512, 1024, 2048]
 CLASSIFIER:
-  TYPE: 'MLRFNet_VIB'
+  TYPE: 'MLRFNet'
 LOSS:
   TYPE: 'BiasedFocalLoss'
   BETA: 1.0

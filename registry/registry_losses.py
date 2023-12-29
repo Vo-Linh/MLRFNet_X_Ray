@@ -1,4 +1,4 @@
-from models.losses import biased_focal_loss, sigmoid_focal_loss
+from models.losses import biased_focal_loss, sigmoid_focal_loss, feature_selection_loss, kl_loss
 from mlflow import log_params
 
 
@@ -28,5 +28,15 @@ def define_loss(config):
                     'BETA': config['LOSS']['BETA'],
                     'REDUCTION': config['LOSS']['REDUCTION']
                     })
-
+    elif config['LOSS']['TYPE'] == 'FeatureSelectionLoss':
+        loss = feature_selection_loss.FeatureSelectionLoss(gamma=config['LOSS']['GAMMA'],
+                                                           loss_weight=config['LOSS']['LOSS_WEIGHT'])
+    
+    elif config['LOSS']['TYPE'] == 'KLLoss':
+        loss = kl_loss.KLLoss(reduction_override=config['LOSS']['REDUCT'],
+                              loss_weight=config['LOSS']['LOSS_WEIGHT'])
+        log_params({"LOSS": config['LOSS']['TYPE'],
+                    'LOSS_WEIGHT': config['LOSS']['LOSS_WEIGHT'],
+                    'REDUCTION': config['LOSS']['REDUCTION']
+                    })
     return loss

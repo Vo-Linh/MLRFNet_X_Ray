@@ -1,17 +1,19 @@
 DATA_TRAIN:
   TYPE: 'Chest14Dataset'
   IMG_DIR: '/home/data_root/chest14'
-  LABEL: '/home/Chest14/Label_Train_Chest14_Full.csv'
-  CLASS_COL: ['Emphysema','Hernia','Nodule','Effusion','Pleural_Thickening','Pneumonia','Cardiomegaly','Infiltration','Consolidation','Atelectasis','Pneumothorax','Mass','Edema','Fibrosis']
+  LABEL: '/home/Chest14/Label_Train_Chest14_50.csv'
+  CLASS_COL: ['Cardiomegaly', 'Edema', 'Consolidation', 'Atelectasis',  'Pleural_Thickening']
   NUM_WORKERS: 2
+  IGN_LABEL: -1
 DATA_VAL:
   TYPE: 'Chest14Dataset'
   IMG_DIR: '/home/data_root/chest14'
-  LABEL: '/home/Chest14/Label_Val_Chest14_Full.csv'
-  CLASS_COL: ['Emphysema','Hernia','Nodule','Effusion','Pleural_Thickening','Pneumonia','Cardiomegaly','Infiltration','Consolidation','Atelectasis','Pneumothorax','Mass','Edema','Fibrosis']
+  LABEL: '/home/Chest14/Label_Train_Chest14_Full.csv'
+  CLASS_COL: ['Cardiomegaly', 'Edema', 'Consolidation', 'Atelectasis',  'Pleural_Thickening']
   NUM_WORKERS: 2
+  IGN_LABEL: -1
 DATA_TEST:
-  USE: 'False'
+  USE: 'True'
   TYPE: 'CheXpertDataset'
   IMG_DIR: '/home/data_root/chesxpert/'
   LABEL: '/home/data_root/chesxpert/valid.csv'
@@ -20,7 +22,7 @@ DATA_TEST:
   NUM_WORKERS: 0
 TRAINING:
   EPOCHS: 20
-  BATCH_SIZE: 32
+  BATCH_SIZE: 64
   LR: 0.0001
   LR_USE_DECAY: False
   LR_DECAY_FACTOR: 0.0
@@ -31,18 +33,15 @@ TRAINING:
 EVALUATION:
   BATCH_SIZE: 64
 BACKBONE:
-  TYPE: 'Res2Net'
-  LAYERS: [3, 4, 6, 3]
-  BASEWIDTH: 26
-  SCALE: 6
-  PRETRAIN: 'https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net50_26w_6s-19041792.pth'
+  TYPE: 'ResNet'
+  PRETRAIN: 'https://download.pytorch.org/models/resnet50-0676ba61.pth'
 NECK:
   TYPE: 'FPN_ECA'
   IN_CHANNELS: [512, 1024, 2048]
 HEAD:
   TYPE: 'MRFC'
   IN_CHANNELS: [512, 1024, 2048]
-  NUM_CLASSES: 14
+  NUM_CLASSES: 5
   LAM: [0.5, 0.3, 0.1]
 SELECTION:
   TYPE: 'FPN_VIB'

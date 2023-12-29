@@ -36,7 +36,7 @@ class Bottle2neck(nn.Module):
         self.conv1 = nn.Conv2d(inplanes, width*scale,
                                kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(width*scale)
-
+        
         if scale == 1:
             self.nums = 1
         else:

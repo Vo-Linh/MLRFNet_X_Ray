@@ -1,4 +1,5 @@
 from models.backbones import res2net
+from models.backbones import resnet
 import torch.utils.model_zoo as model_zoo
 
 
@@ -12,5 +13,13 @@ def define_backbone(config):
         backbone.load_state_dict(model_zoo.load_url(
             config['BACKBONE']['PRETRAIN']),strict=False)
         
-    return backbone
+        return backbone
+    
+    if config['BACKBONE']['TYPE'] == 'ResNet':
+        backbone= resnet.ResNet50()
+        backbone.load_state_dict(model_zoo.load_url(
+            config['BACKBONE']['PRETRAIN']),strict=False)
+        
+        return backbone
+
     

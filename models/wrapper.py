@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torchmetrics.classification import MultilabelAUROC
 from tqdm import tqdm
+import pandas as pd
 
 from .helper_setup import load_weights
 
@@ -14,7 +15,7 @@ class NetworkWrapper:
 
     Args:
         net (nn.Module): The PyTorch model to be trained or evaluated.
-        losses (nn.Module): The loss function to be used.
+        losses (list[nn.Module]): The loss function to be used.
         iter_per_epoch (int): The number of iterations per epoch.
         opt (argparse.Namespace): The parsed command-line arguments.
         config (dict): The configuration dictionary.
@@ -32,7 +33,7 @@ class NetworkWrapper:
         metric_AUC (MultilabelAUROC): The AUROC metric.
     """
 
-    def __init__(self, net, losses, iter_per_epoch, opt, config):
+    def __init__(self, net, losses, iter_per_epoch, opt, config, list_classes):
         self.net = net
         self.iter_per_epoch = iter_per_epoch
         self.gpu_ids = opt.gpu_ids
@@ -44,8 +45,10 @@ class NetworkWrapper:
         self.best_acc = 0.0
         self.config = config
         self.losses = losses
+        self.list_classes = list_classes
         self.num_classes = self.config['HEAD']['NUM_CLASSES']
-        self.metric_AUC = MultilabelAUROC(average='macro',
+        self.eval_mode = 'micro'
+        self.metric_AUC = MultilabelAUROC(average=self.eval_mode,
                                           num_labels=self.num_classes).to(self.device)
 
     def set_optimizer(self, opt, config, optim_dict, lr_dict):
@@ -66,9 +69,8 @@ class NetworkWrapper:
         # Initialize lrd scheduler
         def scheduler_lambda(epoch): return 0.9 ** epoch
         self.lr_scheduler = torch.optim.lr_scheduler.LambdaLR(self.optimizer,
-                                lr_lambda=scheduler_lambda)
+                                                              lr_lambda=scheduler_lambda)
 
-        
     def recursive_todevice(self, x):
         if isinstance(x, torch.Tensor):
             return x.to(self.device, dtype=torch.float)
@@ -81,73 +83,124 @@ class NetworkWrapper:
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        self.lr_scheduler.step()
 
-    def train_epoch(self, epoch, data_loader, log_print):
+    def train_epoch(self, epoch, data_loader, log_print, log_metric_mlflow):
         """Train the model for one epoch.
 
         Args:
             epoch (int): The current epoch.
             data_loader (torch.utils.data.DataLoader): The training data loader.
             log_print (function): A function to print the training log.
+            log_metric_mlflow (function): A function to logging  the training to MLflow.
 
         Returns:
             Namespace: A namespace containing the training loss and accuracy.
         """
         self.net.train()
         self.metric_AUC.reset()
-        epoch_loss = []
+        epoch_loss = {
+            "loss_cls": [],
+            "loss_vib": []
+        }
 
         for data in tqdm(data_loader, ascii=' >='):
             image, mask = self.recursive_todevice(data)
 
-            pred = self.net(image)
-            loss = self.losses(pred, mask)
+            out_net = self.net(image)
+
+            if len(out_net) == 3:
+                pred, mu, std = out_net
+
+                loss_cls = self.losses["loss_cls"](pred, mask)
+                loss_vib = self.losses["loss_vib"](mu, std)
+                epoch_loss["loss_cls"].append(loss_cls.item())
+                epoch_loss['loss_vib'].append(loss_vib.item())
+                loss = loss_cls + loss_vib
+            else:
+                pred = out_net
+                loss_cls = self.losses["loss_cls"](pred, mask)
+                loss = loss_cls
             self.optim_step_(loss)
 
-            epoch_loss.append(loss.item())
+            epoch_loss["loss_cls"].append(loss_cls.item())
+
             self.metric_AUC.update(pred, mask.long())
 
-        acc_train = self.metric_AUC.compute()
-        log_print(
-            f'TRAIN loss={np.mean(epoch_loss):.4f} Acc={acc_train:.4f}')
-        metrics = Namespace(train_loss=np.mean(epoch_loss),
-                            train_acc=acc_train)
         if self.lr_scheduler:
             self.lr_scheduler.step()
+            for param_group in self.optimizer.param_groups:
+                print(f"LR: {param_group['lr']}")
+                
+        if len(out_net) == 3:
+            kl_loss = np.mean(epoch_loss['loss_vib'])
+            log_print(f'KL loss TRAIN {kl_loss:.4f}')
+            log_metric_mlflow('KL loss TRAIN', kl_loss)
+
+        acc_train = self.metric_AUC.compute()
+        if self.eval_mode == 'none':
+            acc_train = torch.mean(acc_train)
+
+        log_print(
+            f'TRAIN loss_cls={np.mean(epoch_loss["loss_cls"]):.4f} Acc={acc_train:.4f}')
+        metrics = Namespace(train_loss_cls=np.mean(epoch_loss["loss_cls"]),
+                            train_acc=acc_train)
 
         return metrics
 
-    def eval_model(self, epoch, data_loader, log_print):
+    def eval_model(self, epoch, data_loader, log_print, log_metric_mlflow):
         """Evaluate the model on the validation set.
 
         Args:
             epoch (int): The current epoch.
             data_loader (torch.utils.data.DataLoader): The validation data loader.
             log_print (function): A function to print the evaluation log.
-
+            log_metric_mlflow (function): A function to logging  the evaluation to MLflow.
         Returns:
             Namespace: A namespace containing the validation loss and accuracy.
             METRICS: Loss and AUROC
         """
         self.net.eval()
         self.metric_AUC.reset()
-        epoch_val_loss = []
+        epoch_val_loss = {
+            "loss_cls": [],
+            "loss_vib": []
+        }
 
         with torch.no_grad():
             for data in tqdm(data_loader, ascii=' >='):
                 (image), mask = self.recursive_todevice(data)
+                out_net = self.net.forward(image)
+                if len(out_net) == 3:
+                    pred, mu, std = out_net
 
-                pred = self.net.forward(image)
-                val_loss = self.losses(pred, mask)
-                epoch_val_loss.append(val_loss.item())
+                    loss_cls = self.losses["loss_cls"](pred, mask)
+                    loss_vib = self.losses["loss_vib"](mu, std)
+                    epoch_val_loss["loss_cls"].append(loss_cls.item())
+                    epoch_val_loss['loss_vib'].append(loss_vib.item())
+
+                else:
+                    pred = out_net
+                    val_loss_cls = self.losses["loss_cls"](pred, mask)
+                    epoch_val_loss["loss_cls"].append(val_loss_cls.item())
+
                 self.metric_AUC.update(pred, mask.long())
 
         acc_val = self.metric_AUC.compute()
+        if self.eval_mode == 'none':
+            dict_acc_val = dict(zip(self.list_classes, acc_val.tolist()))
+            df = pd.DataFrame(dict_acc_val.items(), columns=['Finding', 'Probability'])
+            df = pd.DataFrame(dict_acc_val.items(), columns=['Finding', 'Probability'])
+            log_print(f'AUC per Class: {df.to_string()}')
+            acc_val = torch.mean(acc_val)
+
+        if len(out_net) == 3:
+            kl_loss = np.mean(epoch_val_loss['loss_vib'])
+            log_print(f'KL loss VALID {kl_loss:.4f}')
+            log_metric_mlflow('KL loss VALID', kl_loss)
 
         log_print(
-            f'VALID loss={np.mean(epoch_val_loss):.4f} Acc={acc_val:.4f}')
-        metrics = Namespace(val_loss=np.mean(epoch_val_loss),
+            f'VALID loss_cls={np.mean(epoch_val_loss["loss_cls"]):.4f} Acc={acc_val:.4f}')
+        metrics = Namespace(val_loss_cls=np.mean(epoch_val_loss["loss_cls"]),
                             val_acc=acc_val)
         return metrics
 
@@ -198,6 +251,6 @@ class NetworkWrapper:
             print("Let's use", len(gpu_ids), "GPUs!")
             self.net.to(gpu_ids[0])
             # multi-GPUs
-            self.net = torch.nn.DataParallel(self.net, gpu_ids)  
+            self.net = torch.nn.DataParallel(self.net, gpu_ids)
 
         return self.net

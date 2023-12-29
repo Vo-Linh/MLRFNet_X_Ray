@@ -7,4 +7,4 @@ def define_head(config):
                          num_classes=config['HEAD']['NUM_CLASSES'],
                          lam=config['HEAD']['LAM'])
         
-    return head
+        return head
